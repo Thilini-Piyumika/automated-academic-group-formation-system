@@ -19,7 +19,7 @@ const StudentEntry = () => {
 
   const handleSubmit = (e) => {
     e.preventDefault();
-    console.log(student); // for testing
+    console.log(student); 
     alert("Student details submitted!");
   };
 
