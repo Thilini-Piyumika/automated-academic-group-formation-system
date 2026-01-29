@@ -32,3 +32,4 @@ public class GroupingController {
         return service.createGroups(students, 3, 2);
     }
 }
+}
