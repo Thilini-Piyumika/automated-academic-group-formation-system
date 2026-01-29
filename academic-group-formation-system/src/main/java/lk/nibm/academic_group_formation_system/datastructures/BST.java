@@ -3,7 +3,6 @@ package lk.nibm.academic_group_formation_system.datastructures;
 import lk.nibm.academic_group_formation_system.model.Student;
 
 import java.util.ArrayList;
-import java.util.LinkedList;
 import java.util.List;
 
 public class BST {
@@ -36,18 +35,6 @@ public class BST {
             traverse(node.left, list);
             list.add(node.student);
             traverse(node.right, list);
-        }
-    }
-
-    LinkedList<Student> bestFit = new LinkedList<>();
-    LinkedList<Student> averageFit = new LinkedList<>();
-    LinkedList<Student> needsSupport = new LinkedList<>();
-
-for (Student s : sorted) {
-        switch (s.getCategory()) {
-            case "Best Fit" -> bestFit.add(s);
-            case "Average Fit" -> averageFit.add(s);
-            case "Needs Support" -> needsSupport.add(s);
         }
     }
 }
