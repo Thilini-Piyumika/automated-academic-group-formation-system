@@ -30,7 +30,7 @@ public class BST {
         return list;
     }
 
-    private void traverse(BSTNode node, List<Student> list) {
+    //private void traverse(BSTNode node, List<Student> list) {
         if (node != null) {
             traverse(node.left, list);
             list.add(node.student);
