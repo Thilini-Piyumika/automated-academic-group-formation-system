@@ -13,9 +13,11 @@ public class GroupingService {
 
     private final CollaborationGraph graph = new CollaborationGraph();
 
-    public Map<String, List<Student>> createGroups(List<Student> students,
-                                                   int groupSize,
-                                                   int repetitionThreshold) {
+    public Map<String, List<Student>> createGroups(
+            List<Student> students,
+            int groupSize,
+            int repetitionThreshold,
+            GroupingStrategy strategy) {
 
         // 1. Calculate readiness score
         for (Student s : students) {
@@ -51,25 +53,30 @@ public class GroupingService {
             }
         }
 
-        // 4. Create groups
         Map<String, List<Student>> groups = new LinkedHashMap<>();
-        LinkedList<Student> pool = new LinkedList<>(sorted);
-
         int groupNumber = 1;
 
-        while (pool.size() >= groupSize) {
-            List<Student> group = new ArrayList<>();
+        while (bestFit.size() + averageFit.size() + needsSupport.size() >= groupSize) {
 
-            while (group.size() < groupSize) {
-                group.add(pool.removeLast()); // take high-ranked first
-            }
+            List<Student> group = formGroupByStrategy(
+                    strategy, groupSize, bestFit, averageFit, needsSupport);
 
-            // repetition check
+            if (group.size() < groupSize) break;
+
             List<String> ids = extractIds(group);
+
             while (graph.violatesThreshold(ids, repetitionThreshold)) {
                 Student removed = group.remove(group.size() - 1);
-                pool.addFirst(removed);
-                group.add(pool.removeLast());
+
+                // return removed student to correct category list
+                switch (removed.getCategory()) {
+                    case "Best Fit" -> bestFit.addFirst(removed);
+                    case "Average Fit" -> averageFit.addFirst(removed);
+                    case "Needs Support" -> needsSupport.addFirst(removed);
+                }
+
+                group = formGroupByStrategy(
+                        strategy, groupSize, bestFit, averageFit, needsSupport);
                 ids = extractIds(group);
             }
 
