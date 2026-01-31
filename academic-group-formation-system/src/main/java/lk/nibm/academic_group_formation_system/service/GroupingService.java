@@ -39,6 +39,18 @@ public class GroupingService {
             else sorted.get(i).setCategory("Best Fit");
         }
 
+        LinkedList<Student> bestFit = new LinkedList<>();
+        LinkedList<Student> averageFit = new LinkedList<>();
+        LinkedList<Student> needsSupport = new LinkedList<>();
+
+        for (Student s : sorted) {
+            switch (s.getCategory()) {
+                case "Best Fit" -> bestFit.add(s);
+                case "Average Fit" -> averageFit.add(s);
+                case "Needs Support" -> needsSupport.add(s);
+            }
+        }
+
         // 4. Create groups
         Map<String, List<Student>> groups = new LinkedHashMap<>();
         LinkedList<Student> pool = new LinkedList<>(sorted);
