@@ -2,6 +2,7 @@ package lk.nibm.academic_group_formation_system.service;
 
 import lk.nibm.academic_group_formation_system.datastructures.BST;
 import lk.nibm.academic_group_formation_system.datastructures.CollaborationGraph;
+import lk.nibm.academic_group_formation_system.model.GroupingStrategy;
 import lk.nibm.academic_group_formation_system.model.Student;
 import org.springframework.stereotype.Service;
 
@@ -71,6 +72,47 @@ public class GroupingService {
         List<String> ids = new ArrayList<>();
         for (Student s : group) ids.add(s.getId());
         return ids;
+    }
+
+    private List<Student> formGroupByStrategy(
+            GroupingStrategy strategy,
+            int groupSize,
+            LinkedList<Student> best,
+            LinkedList<Student> average,
+            LinkedList<Student> needs) {
+
+        List<Student> group = new ArrayList<>();
+
+        switch (strategy) {
+
+            case BEST_BEST -> {
+                while (group.size() < groupSize && !best.isEmpty()) {
+                    group.add(best.removeLast());
+                }
+            }
+
+            case BEST_AVERAGE -> {
+                if (!best.isEmpty()) group.add(best.removeLast());
+                while (group.size() < groupSize && !average.isEmpty()) {
+                    group.add(average.removeLast());
+                }
+            }
+
+            case AVERAGE_NEEDS_SUPPORT -> {
+                if (!average.isEmpty()) group.add(average.removeLast());
+                while (group.size() < groupSize && !needs.isEmpty()) {
+                    group.add(needs.removeLast());
+                }
+            }
+
+            case NEEDS_SUPPORT_ONLY -> {
+                while (group.size() < groupSize && !needs.isEmpty()) {
+                    group.add(needs.removeLast());
+                }
+            }
+        }
+
+        return group;
     }
 }
 
