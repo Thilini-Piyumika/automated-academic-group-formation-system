@@ -1,0 +1,162 @@
+.login-page{
+display: flex;
+  height: 100vh;      /* exactly window height */
+  width: 100vw;
+
+}
+
+.login-left {
+  width: 774.5px;
+  
+  position: relative;
+  background: #1f3c88;
+}
+
+
+.Sg-image{
+    width: 610px;
+  height: 377px;
+  position: absolute;
+  left: 82px;
+  bottom: 382px;
+  top: 385px;
+}
+.logo{
+    position: absolute;
+width:225;
+height: 203;
+top: 122px;
+bottom: 619px;
+left: 285px;
+right: 291.5px;
+
+}
+.login-right{
+width: 774.5px;
+
+
+}
+.brand{
+position: relative; 
+color: #1F3C88;
+text-align: center;
+font-family: "Segoe UI";
+font-size: 64px;
+font-style: normal;
+font-weight: 700;
+line-height: 11.469px; 
+top: 141px;
+bottom: 747px;
+left: 169
+
+
+}
+.login-box{
+    width: 400px;
+    
+    top: 222.5px;
+    left: 187.3px;
+    right: 187.25px;
+    position:relative;
+    border-radius: 12px;
+background: #FFF;
+
+
+}
+.welcome{
+    color: #0A0A0A;
+font-family: "Segoe UI";
+font-size: 28px;
+font-style: normal;
+font-weight: 600;
+line-height: 42px; 
+top: 39px;
+left: 102.5;
+text-align: center;
+}
+.para{
+color: #6C757D;
+font-family: "Segoe UI";
+font-size: 16px;
+font-style: normal;
+font-weight: 400;
+line-height: 24px;
+text-align: center;
+}
+.login-form{
+    margin-bottom: 20px;
+    gap: 8px; 
+ display: flex;
+  flex-direction: column;
+   border-radius: 12px;
+background: #FFF;
+
+left: 40px;
+right: 40px;
+width: 320px;
+
+position: relative;
+}
+.form-group-email{
+    display: flex;
+padding: 14.25px 151px 14.25px 12px;
+align-items: center;
+display: flex;
+  flex-direction: column;
+  gap: 18px;
+}
+
+.login-btn{
+  
+ margin-top: 24px;
+   width: auto;          /* not full width anymore */
+  padding: 12px 40px;   /* nice centered button size */
+  background: #1f3c88;
+  color: white;
+  border: none;
+  border-radius: 8px;
+  font-size: 16px;
+  cursor: pointer;
+  align-items: center;
+
+}
+
+.email-input{
+     display: flex;
+
+flex-direction: column;
+justify-content: center;
+
+gap: 8px;
+}
+.form-group {
+  display: flex;
+  flex-direction: column;
+  text-align: left;
+}
+
+.form-group label {
+  margin-bottom: 6px;
+  font-size: 14px;
+  font-weight: 600;
+}
+
+.form-group input {
+  padding: 12px;
+  border-radius: 8px;
+  border: 1px solid #d1d5db;
+  font-size: 14px;
+}
+.login-btn:hover {
+  background: #162f6b;
+  
+}
+.forgot-link {
+  display: block;
+  margin-top: 20px;
+  color: #3b82f6;
+  font-size: 14px;
+  text-decoration: none;
+  text-align: center;
+  margin-top: 20px;
+}
