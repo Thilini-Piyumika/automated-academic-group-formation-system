@@ -7,35 +7,43 @@ import com.nibm.academic_group_formation_tool.model.Student;
 @Service
 public class GroupService {
 
-    public List<List<Student>> createGroups(List<Student> students,
-                                            int groupSize,
-                                            double threshold,
-                                            double w1,
-                                            double w2,
-                                            double w3,
-                                            int strategy) {
+    private LinkedList<LinkedList<Student>> lastGeneratedGroups;
 
-        // STEP 1 — Calculate readiness score + category for ALL students
+    private double lastW1, lastW2, lastW3, lastThreshold;
+    private int lastStrategy, lastGroupSize;
+
+    // NEW: totals
+    private int lastTotalStudents;
+    private int lastEligibleStudents;
+    private int lastReviewStudents;
+
+    public LinkedList<LinkedList<Student>> createGroups(List<Student> students,
+                                                        int groupSize,
+                                                        double threshold,
+                                                        double w1,
+                                                        double w2,
+                                                        double w3,
+                                                        int strategy) {
+
+        lastW1 = w1;
+        lastW2 = w2;
+        lastW3 = w3;
+        lastThreshold = threshold;
+        lastStrategy = strategy;
+        lastGroupSize = groupSize;
+
+        // READINESS SCORE
         for (Student s : students) {
-
-            // Convert attendance (0–100) to GPA scale (0–4)
             double attendanceGPA = (s.getAttendance() / 100.0) * 4.0;
-
             double totalWeight = w1 + w2 + w3;
-            double score = 0;
 
-            if (totalWeight > 0) {
-                score =
-                        (
-                                (attendanceGPA * w1) +
-                                        (s.getThisYearGpa() * w2) +
-                                        (s.getPreviousYearGpa() * w3)
-                        ) / totalWeight;
-            }
+            double score = ((attendanceGPA * w1) +
+                    (s.getThisYearGpa() * w2) +
+                    (s.getPreviousYearGpa() * w3)) / totalWeight;
 
+            score = Math.round(score * 100.0) / 100.0;
             s.setReadinessScore(score);
 
-            // GPA-style categories
             if (score >= 3.5)
                 s.setCategory("BEST");
             else if (score >= 2.5)
@@ -44,206 +52,144 @@ public class GroupService {
                 s.setCategory("NEEDS_SUPPORT");
         }
 
-        // STEP 2 — Split into Eligible Queue & Review Queue (by attendance)
-        List<Student> eligibleQueue = new ArrayList<>();
-        List<Student> reviewQueue = new ArrayList<>();
+        List<Student> eligible = new ArrayList<>();
+        List<Student> review = new ArrayList<>();
 
         for (Student s : students) {
             if (s.getAttendance() >= threshold)
-                eligibleQueue.add(s);
+                eligible.add(s);
             else
-                reviewQueue.add(s);
+                review.add(s);
         }
 
-        // STEP 3 — Build BST using ONLY eligible students (key = readinessScore)
-        BSTNode root = null;
-        for (Student s : eligibleQueue) {
-            root = insert(root, s);
-        }
+        // SAVE TOTALS
+        lastTotalStudents = students.size();
+        lastEligibleStudents = eligible.size();
+        lastReviewStudents = review.size();
 
-        // STEP 4 — Sort eligible students from highest → lowest score
-        List<Student> sorted = new ArrayList<>();
-        reverseInorder(root, sorted);
+        // SORT BY SCORE DESC
+        eligible.sort((a, b) ->
+                Double.compare(b.getReadinessScore(), a.getReadinessScore()));
 
-        // STEP 5 — Split sorted eligible students by category
         List<Student> best = new ArrayList<>();
-        List<Student> average = new ArrayList<>();
+        List<Student> avg = new ArrayList<>();
         List<Student> worst = new ArrayList<>();
 
-        for (Student s : sorted) {
-            if ("BEST".equals(s.getCategory()))
-                best.add(s);
-            else if ("AVERAGE".equals(s.getCategory()))
-                average.add(s);
-            else
-                worst.add(s);
+        for (Student s : eligible) {
+            if (s.getCategory().equals("BEST")) best.add(s);
+            else if (s.getCategory().equals("AVERAGE")) avg.add(s);
+            else worst.add(s);
         }
 
-        // STEP 6 — Apply chosen strategy
-        List<List<Student>> groups;
+        LinkedList<LinkedList<Student>> groups;
 
-        if (strategy == 1) {
-            groups = bestBestStrategy(best, average, worst, groupSize);
-        } else if (strategy == 2) {
-            groups = bestAverageStrategy(best, average, worst, groupSize);
-        } else {
-            groups = mixedStrategy(best, average, worst, groupSize);
-        }
+        if (strategy == 1)
+            groups = bestBest(best, avg, worst, groupSize);
+        else if (strategy == 2)
+            groups = bestAverage(best, avg, worst, groupSize);
+        else
+            groups = mixed(best, avg, worst, groupSize);
 
-        // STEP 7 — Add review queue as LAST single group
-        if (!reviewQueue.isEmpty()) {
-            groups.add(reviewQueue);
-        }
+        if (!review.isEmpty())
+            groups.add(new LinkedList<>(review));
 
+        lastGeneratedGroups = groups;
         return groups;
     }
 
-    // ==============================
-    // STRATEGY 1 — Best–Best (Homogeneous)
-    // BEST→BEST, then AVERAGE, then WORST
-    // ==============================
-    private List<List<Student>> bestBestStrategy(List<Student> best,
-                                                 List<Student> average,
-                                                 List<Student> worst,
-                                                 int groupSize) {
+    public LinkedList<LinkedList<Student>> getLastGroups() { return lastGeneratedGroups; }
+    public double getW1() { return lastW1; }
+    public double getW2() { return lastW2; }
+    public double getW3() { return lastW3; }
+    public double getThreshold() { return lastThreshold; }
+    public int getStrategy() { return lastStrategy; }
+    public int getGroupSize() { return lastGroupSize; }
 
-        List<List<Student>> groups = new ArrayList<>();
+    // NEW getters for totals
+    public int getTotalStudents() { return lastTotalStudents; }
+    public int getEligibleStudents() { return lastEligibleStudents; }
+    public int getReviewStudents() { return lastReviewStudents; }
+
+    // STRATEGY 1
+    private LinkedList<LinkedList<Student>> bestBest(List<Student> best, List<Student> avg, List<Student> worst, int size) {
+        LinkedList<LinkedList<Student>> groups = new LinkedList<>();
         List<Student> pool = new ArrayList<>();
-
-        // Priority order: BEST first, then AVERAGE, then WORST
         pool.addAll(best);
-        pool.addAll(average);
+        pool.addAll(avg);
         pool.addAll(worst);
 
-        List<Student> current = new ArrayList<>();
+        LinkedList<Student> current = new LinkedList<>();
 
         for (Student s : pool) {
             current.add(s);
-            if (current.size() == groupSize) {
-                groups.add(new ArrayList<>(current));
+            if (current.size() == size) {
+                groups.add(new LinkedList<>(current));
                 current.clear();
             }
         }
 
-        if (!current.isEmpty())
-            groups.add(current);
-
+        if (!current.isEmpty()) groups.add(current);
         return groups;
     }
 
-    // ==============================
-    // STRATEGY 2 — Best–Average (Semi-balanced)
-    // Try BEST+AVERAGE first, fallback to WORST
-    // ==============================
-    private List<List<Student>> bestAverageStrategy(
-            List<Student> best,
-            List<Student> average,
-            List<Student> worst,
-            int groupSize) {
+    private LinkedList<LinkedList<Student>> bestAverage(List<Student> best,
+                                                        List<Student> avg,
+                                                        List<Student> worst,
+                                                        int size) {
 
-        List<List<Student>> groups = new ArrayList<>();
+        LinkedList<LinkedList<Student>> groups = new LinkedList<>();
 
-        while (!best.isEmpty() || !average.isEmpty() || !worst.isEmpty()) {
+        while (!best.isEmpty() || !avg.isEmpty() || !worst.isEmpty()) {
 
-            List<Student> group = new ArrayList<>();
+            LinkedList<Student> g = new LinkedList<>();
 
-            while (group.size() < groupSize &&
-                    (!best.isEmpty() || !average.isEmpty() || !worst.isEmpty())) {
+            while (g.size() < size &&
+                    (!best.isEmpty() || !avg.isEmpty() || !worst.isEmpty())) {
 
-                // 1st priority → BEST
-                if (!best.isEmpty() && group.size() < groupSize)
-                    group.add(best.remove(0));
-
-                // 2nd priority → AVERAGE
-                if (!average.isEmpty() && group.size() < groupSize)
-                    group.add(average.remove(0));
-
-                // 3rd priority → BEST again
-                if (!best.isEmpty() && group.size() < groupSize)
-                    group.add(best.remove(0));
-
-                // 4th priority → AVERAGE again
-                if (!average.isEmpty() && group.size() < groupSize)
-                    group.add(average.remove(0));
-
-                // Last fallback → WORST
-                if (!worst.isEmpty() && group.size() < groupSize)
-                    group.add(worst.remove(0));
+                if (!best.isEmpty() && !avg.isEmpty()) {
+                    g.add(best.remove(0));
+                    if (g.size() < size) g.add(avg.remove(0));
+                }
+                else if (!best.isEmpty() && !worst.isEmpty()) {
+                    g.add(best.remove(0));
+                    if (g.size() < size) g.add(worst.remove(0));
+                }
+                else if (!avg.isEmpty() && !worst.isEmpty()) {
+                    g.add(avg.remove(0));
+                    if (g.size() < size) g.add(worst.remove(0));
+                }
+                else if (!best.isEmpty()) g.add(best.remove(0));
+                else if (!avg.isEmpty()) g.add(avg.remove(0));
+                else if (!worst.isEmpty()) g.add(worst.remove(0));
             }
 
-            groups.add(group);
+            groups.add(g);
         }
 
         return groups;
     }
 
-    // ==============================
-    // STRATEGY 3 — MIXED (Balanced)
-    // 1 BEST + 1 AVERAGE + 1 WORST + 1 ANY
-    // ==============================
-    private List<List<Student>> mixedStrategy(List<Student> best,
-                                              List<Student> average,
-                                              List<Student> worst,
-                                              int groupSize) {
+    // STRATEGY 3
+    private LinkedList<LinkedList<Student>> mixed(List<Student> best, List<Student> avg, List<Student> worst, int size) {
+        LinkedList<LinkedList<Student>> groups = new LinkedList<>();
 
-        List<List<Student>> groups = new ArrayList<>();
+        while (!best.isEmpty() || !avg.isEmpty() || !worst.isEmpty()) {
+            LinkedList<Student> g = new LinkedList<>();
 
-        while (!best.isEmpty() || !average.isEmpty() || !worst.isEmpty()) {
+            if (!best.isEmpty()) g.add(best.remove(0));
+            if (!avg.isEmpty()) g.add(avg.remove(0));
+            if (!worst.isEmpty()) g.add(worst.remove(0));
 
-            List<Student> group = new ArrayList<>();
-
-            // 1 BEST
-            if (!best.isEmpty() && group.size() < groupSize)
-                group.add(best.remove(0));
-
-            // 1 AVERAGE
-            if (!average.isEmpty() && group.size() < groupSize)
-                group.add(average.remove(0));
-
-            // 1 WORST
-            if (!worst.isEmpty() && group.size() < groupSize)
-                group.add(worst.remove(0));
-
-            // Fill remaining slots with ANY available students
-            while (group.size() < groupSize &&
-                    (!best.isEmpty() || !average.isEmpty() || !worst.isEmpty())) {
-
-                if (!best.isEmpty())
-                    group.add(best.remove(0));
-                else if (!average.isEmpty())
-                    group.add(average.remove(0));
-                else
-                    group.add(worst.remove(0));
+            while (g.size() < size) {
+                if (!best.isEmpty()) g.add(best.remove(0));
+                else if (!avg.isEmpty()) g.add(avg.remove(0));
+                else if (!worst.isEmpty()) g.add(worst.remove(0));
+                else break;
             }
 
-            groups.add(group);
+            groups.add(g);
         }
 
         return groups;
-    }
-
-    // ==============================
-    // BST INSERT
-    // ==============================
-    private BSTNode insert(BSTNode root, Student s) {
-        if (root == null) return new BSTNode(s);
-
-        if (s.getReadinessScore() < root.student.getReadinessScore())
-            root.left = insert(root.left, s);
-        else
-            root.right = insert(root.right, s);
-
-        return root;
-    }
-
-    // ==============================
-    // REVERSE INORDER = Highest → Lowest
-    // ==============================
-    private void reverseInorder(BSTNode root, List<Student> list) {
-        if (root == null) return;
-
-        reverseInorder(root.right, list);
-        list.add(root.student);
-        reverseInorder(root.left, list);
     }
 }
