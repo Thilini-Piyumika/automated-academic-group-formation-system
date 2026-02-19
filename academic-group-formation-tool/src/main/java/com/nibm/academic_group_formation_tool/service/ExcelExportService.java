@@ -36,12 +36,20 @@ public class ExcelExportService {
 
         int gIndex = 1;
         int totalGroups = groups.size();
+        boolean hasReviewGroup = reviewStudents > 0;
 
         for (int i = 0; i < groups.size(); i++) {
 
             LinkedList<Student> group = groups.get(i);
 
-            String groupName = (i == totalGroups - 1) ? "Review Group" : "Group " + gIndex;
+            String groupName;
+
+            // Only mark last group as Review Group if review exists
+            if (hasReviewGroup && i == totalGroups - 1) {
+                groupName = "Review Group";
+            } else {
+                groupName = "Group " + gIndex;
+            }
 
             for (Student s : group) {
                 Row r = sheet.createRow(rowNum++);
@@ -64,6 +72,7 @@ public class ExcelExportService {
         // MODEL DETAILS
         Sheet details = workbook.createSheet("Model_Details");
         int r = 0;
+
 
         details.createRow(r++).createCell(0).setCellValue("Group Size: " + size);
         details.createRow(r++).createCell(0).setCellValue("Attendance Threshold: " + threshold + "%");
