@@ -1,0 +1,297 @@
+/* ===============================
+   GLOBAL STYLES
+================================= */
+
+body {
+  margin: 0;
+  font-family: 'Segoe UI', Roboto, sans-serif;
+  background: linear-gradient(135deg, #e3f2fd, #f5f7fa);
+}
+
+/* ===============================
+   MAIN CONTAINER
+================================= */
+
+.container {
+  padding: 30px;
+}
+
+.title {
+  text-align: center;
+  font-size: 28px;
+  font-weight: 600;
+  margin-bottom: 30px;
+  color: #1f2937;
+}
+
+/* ===============================
+   LAYOUT
+================================= */
+
+.layout {
+  display: flex;
+  gap: 25px;
+  align-items: flex-start;
+}
+
+/* ===============================
+   HEADER CONTAINER
+================================= */
+
+.header-container {
+  background: rgba(255, 255, 255, 0.9);
+  padding: 25px 30px;
+  border-radius: 18px;
+  box-shadow: 0 8px 30px rgba(0, 0, 0, 0.08);
+  margin-bottom: 35px;
+}
+
+/* ===============================
+   HEADER CONTENT
+================================= */
+
+.header {
+  display: flex;
+  align-items: center;
+  gap: 20px;
+}
+
+.logo {
+  height: 80px;
+  width: auto;
+}
+
+.title {
+  font-size: 26px;
+  font-weight: 600;
+  color: #1f2937;
+  margin: 0;
+}
+
+.subtitle {
+  font-size: 14px;
+  color: #6b7280;
+  margin-top: 5px;
+}
+
+/* ===============================
+   SIDEBAR (Modern Card Style)
+================================= */
+
+.sidebar {
+  width: 30%;
+  background: rgba(255, 255, 255, 0.85);
+  backdrop-filter: blur(10px);
+  padding: 25px;
+  border-radius: 16px;
+  box-shadow: 0 8px 25px rgba(0, 0, 0, 0.08);
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  transition: 0.3s ease;
+  max-height: 650px;     
+  overflow-y: auto;
+}
+
+.sidebar:hover {
+  transform: translateY(-3px);
+}
+
+.sidebar h3,
+.sidebar h4 {
+  margin-top: 10px;
+  color: #111827;
+}
+
+.sidebar input,
+.sidebar select {
+  padding: 8px 10px;
+  border-radius: 8px;
+  border: 1px solid #d1d5db;
+  transition: 0.2s ease;
+  font-size: 14px;
+}
+
+.sidebar input:focus,
+.sidebar select:focus {
+  outline: none;
+  border-color: #2563eb;
+  box-shadow: 0 0 0 2px rgba(37, 99, 235, 0.2);
+}
+
+.sidebar small {
+  font-size: 12px;
+  color: #6b7280;
+}
+
+.checkbox-label {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 14px;
+}
+
+/* ===============================
+   BUTTONS
+================================= */
+
+.button-row {
+  margin-top: 20px;
+  display: flex;
+  gap: 12px;
+}
+
+button {
+  padding: 10px 16px;
+  border: none;
+  border-radius: 10px;
+  background: linear-gradient(135deg, #2563eb, #1e40af);
+  color: white;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+button:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 18px rgba(37, 99, 235, 0.3);
+}
+
+/* ===============================
+   PREVIEW PANEL
+================================= */
+
+.preview-panel {
+  width: 70%;
+}
+
+.preview-panel h3 {
+  margin-bottom: 15px;
+  color: #1f2937;
+}
+
+.preview-box {
+  max-height: 600px;
+  overflow-y: auto;
+  background: rgba(255, 255, 255, 0.9);
+  padding: 20px;
+  border-radius: 16px;
+  box-shadow: 0 8px 25px rgba(0, 0, 0, 0.08);
+}
+
+/* ===============================
+   GROUP BLOCK
+================================= */
+
+.group-block {
+  margin-bottom: 30px;
+  animation: fadeIn 0.4s ease-in-out;
+}
+
+.group-block h4 {
+  margin-bottom: 10px;
+  color: #374151;
+}
+
+/* ===============================
+   TABLE DESIGN
+================================= */
+
+table {
+  width: 100%;
+  border-collapse: collapse;
+  border-radius: 10px;
+  overflow: hidden;
+  font-size: 14px;
+}
+
+th {
+  background-color: #1e293b;
+  color: white;
+  padding: 10px;
+}
+
+td {
+  padding: 8px;
+  text-align: center;
+  border-bottom: 1px solid #e5e7eb;
+}
+
+tr:hover {
+  background-color: #f3f4f6;
+}
+
+/* ===============================
+   CATEGORY COLORS (Soft Modern)
+================================= */
+
+.best-row {
+  background-color: rgba(34, 197, 94, 0.15);
+}
+
+.average-row {
+  background-color: rgba(251, 191, 36, 0.15);
+}
+
+.worst-row {
+  background-color: rgba(239, 68, 68, 0.15);
+}
+
+/* ===============================
+   EXCEL FORMAT BOX
+================================= */
+
+.excel-format-box {
+  margin-top: 15px;
+  padding: 15px;
+  background: #f9fafb;
+  border-left: 4px solid #2563eb;
+  border-radius: 10px;
+  font-size: 13px;
+}
+
+.excel-format-box h4 {
+  margin: 0 0 8px 0;
+}
+
+.excel-format-box ul {
+  padding-left: 18px;
+  margin: 5px 0;
+}
+
+.excel-format-box small {
+  color: #ef4444;
+  font-weight: 500;
+}
+
+/* ===============================
+   ANIMATIONS
+================================= */
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(8px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* ===============================
+   SCROLLBAR MODERN STYLE
+================================= */
+
+.preview-box::-webkit-scrollbar {
+  width: 8px;
+}
+
+.preview-box::-webkit-scrollbar-thumb {
+  background: #cbd5e1;
+  border-radius: 10px;
+}
+
+.preview-box::-webkit-scrollbar-thumb:hover {
+  background: #94a3b8;
+}

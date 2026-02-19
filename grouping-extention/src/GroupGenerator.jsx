@@ -1,4 +1,6 @@
 import React, { useState } from "react";
+import "./GroupGenerator.css";
+import nibmLogo from "./NIBMLogo.png";
 
 const GroupGenerator = () => {
 
@@ -12,9 +14,6 @@ const GroupGenerator = () => {
   const [detailed, setDetailed] = useState(true);
   const [groups, setGroups] = useState([]);
 
-  // ======================
-  // GENERATE GROUPS
-  // ======================
   const handleGenerate = async () => {
 
     if (!file) {
@@ -40,11 +39,7 @@ const GroupGenerator = () => {
     setGroups(data);
   };
 
-  // ======================
-  // DOWNLOAD EXCEL
-  // ======================
   const handleDownload = async () => {
-
     const response = await fetch(
       `http://localhost:8080/api/export?detailed=${detailed}`
     );
@@ -58,62 +53,105 @@ const GroupGenerator = () => {
     a.click();
   };
 
+  const getCategoryClass = (category) => {
+    if (category === "BEST") return "best-row";
+    if (category === "AVERAGE") return "average-row";
+    if (category === "NEEDS_SUPPORT") return "worst-row";
+    return "";
+  };
+
   return (
-    <div style={styles.container}>
+    <div className="container">
 
-      <h2>Automated Academic Group Formation</h2>
+      {/* HEADER CONTAINER */}
+      <div className="header-container">
+        <div className="header">
+          <img src={nibmLogo} alt="NIBM Logo" className="logo" />
+          <div>
+            <h2 className="title">
+              GroupMe - Academic Group Formation Tool
+            </h2>
+            <p className="subtitle">
+              NIBM – Higher National Diploma in Software Engineering
+            </p>
+          </div>
+        </div>
+      </div>
 
-      <div style={styles.card}>
+      <div className="layout">
 
-        <label>Upload Excel File</label>
-        <input
-          type="file"
-          accept=".xlsx"
-          onChange={(e) => setFile(e.target.files[0])}
-        />
+        {/* LEFT SIDE SETTINGS */}
+        <div className="sidebar">
 
-        <div style={styles.grid}>
+          <h3>⚙️ Group Settings</h3>
 
-          <input
-            type="number"
+          <h4>1. Upload Student Excel File</h4>
+          <input type="file" accept=".xlsx"
+            onChange={(e) => setFile(e.target.files[0])}
+          />
+
+          <div className="excel-format-box">
+            <h4>Required Excel File Format</h4>
+            <p><strong>Column Order (Strictly Follow This Order):</strong></p>
+
+            <ul>
+              <li><strong>Column 1:</strong> Student ID (Text)</li>
+              <li><strong>Column 2:</strong> Attendance (%) – Number (0–100)</li>
+              <li><strong>Column 3:</strong> Current GPA – Number (0–4)</li>
+              <li><strong>Column 4:</strong> Previous Year GPA – Number (0–4)</li>
+            </ul>
+
+            <small>
+              ⚠ First row must contain headers. Do not change column order.
+            </small>
+          </div>
+
+          <h4>2. Group Size</h4>
+          <input type="number"
             value={size}
             onChange={(e) => setSize(e.target.value)}
-            placeholder="Group Size"
           />
 
-          <input
-            type="number"
+          <h4>3. Attendance Threshold (%)</h4>
+          <input type="number"
             value={threshold}
             onChange={(e) => setThreshold(e.target.value)}
-            placeholder="Attendance Threshold (%)"
           />
+          <small>
+            Students below this percentage will be placed in the Review Group.
+          </small>
 
-          <input
-            type="number"
-            step="0.1"
+          <hr />
+
+          <h4>4. Readiness Score Weights</h4>
+
+          <label>Attendance Weight (W1)</label>
+          <input type="number" step="0.1"
             value={w1}
             onChange={(e) => setW1(e.target.value)}
-            placeholder="Attendance Weight (W1)"
           />
 
-          <input
-            type="number"
-            step="0.1"
+          <label>Current GPA Weight (W2)</label>
+          <input type="number" step="0.1"
             value={w2}
             onChange={(e) => setW2(e.target.value)}
-            placeholder="Current GPA Weight (W2)"
           />
 
-          <input
-            type="number"
-            step="0.1"
+          <label>Previous GPA Weight (W3)</label>
+          <input type="number" step="0.1"
             value={w3}
             onChange={(e) => setW3(e.target.value)}
-            placeholder="Previous GPA Weight (W3)"
           />
 
-          <select
-            value={strategy}
+          <small>
+            Readiness Score = Weighted GPA of Attendance, Current GPA & Previous GPA.
+          </small>
+
+          <hr />
+
+          <h4>5. Grouping Strategy</h4>
+
+          <select value={strategy}
             onChange={(e) => setStrategy(e.target.value)}
           >
             <option value="1">Strategy 1 – Best-Best</option>
@@ -121,10 +159,13 @@ const GroupGenerator = () => {
             <option value="3">Strategy 3 – Mixed</option>
           </select>
 
-        </div>
+          <small>
+            Strategy 2 Order: BEST+AVG → BEST+WORST → AVG+WORST → Fill Remaining
+          </small>
 
-        <div style={{ marginTop: "10px" }}>
-          <label>
+          <hr />
+
+          <label className="checkbox-label">
             <input
               type="checkbox"
               checked={detailed}
@@ -132,55 +173,73 @@ const GroupGenerator = () => {
             />
             Detailed Excel Export
           </label>
+
+          <div className="button-row">
+            <button onClick={handleGenerate}>Generate Groups</button>
+            <button onClick={handleDownload}>Download Excel</button>
+          </div>
+
         </div>
 
-        <div style={styles.buttonRow}>
-          <button onClick={handleGenerate}>Generate Groups</button>
-          <button onClick={handleDownload}>Download Excel</button>
+        {/* RIGHT SIDE PREVIEW */}
+        <div className="preview-panel">
+
+          <h3>📊 Group Preview</h3>
+
+          <div className="preview-box">
+
+            {groups.length === 0 && (
+              <p>No groups generated yet.</p>
+            )}
+
+            {groups.map((group, index) => {
+
+              const isLast = index === groups.length - 1;
+              const groupName = isLast
+                ? "Review Group"
+                : `Group ${index + 1}`;
+
+              return (
+                <div key={index} className="group-block">
+
+                  <h4>{groupName}</h4>
+
+                  <table>
+                    <thead>
+                      <tr>
+                        <th>ID</th>
+                        <th>Attendance</th>
+                        <th>GPA</th>
+                        <th>Prev GPA</th>
+                        <th>Score</th>
+                        <th>Category</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {group.map((student, i) => (
+                        <tr key={i} className={getCategoryClass(student.category)}>
+                          <td>{student.studentId}</td>
+                          <td>{student.attendance}</td>
+                          <td>{student.thisYearGpa}</td>
+                          <td>{student.previousYearGpa}</td>
+                          <td>{student.readinessScore}</td>
+                          <td>{student.category}</td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+
+                </div>
+              );
+            })}
+
+          </div>
+
         </div>
 
       </div>
-
-      <h3>Generated Groups (Preview)</h3>
-
-      <div style={styles.preview}>
-        <pre>{JSON.stringify(groups, null, 2)}</pre>
-      </div>
-
     </div>
   );
-};
-
-const styles = {
-  container: {
-    maxWidth: "1000px",
-    margin: "auto",
-    padding: "20px",
-    fontFamily: "Arial"
-  },
-  card: {
-    background: "#f5f5f5",
-    padding: "20px",
-    borderRadius: "10px"
-  },
-  grid: {
-    display: "grid",
-    gridTemplateColumns: "repeat(3, 1fr)",
-    gap: "10px",
-    marginTop: "15px"
-  },
-  buttonRow: {
-    marginTop: "15px",
-    display: "flex",
-    gap: "10px"
-  },
-  preview: {
-    background: "#eee",
-    padding: "10px",
-    borderRadius: "6px",
-    maxHeight: "300px",
-    overflow: "auto"
-  }
 };
 
 export default GroupGenerator;
