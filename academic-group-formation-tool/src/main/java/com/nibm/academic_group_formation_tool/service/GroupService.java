@@ -60,7 +60,7 @@ public class GroupService {
                 s.setCategory("NEEDS_SUPPORT");
         }
 
-        // ---------------- ATTENDANCE FILTERING ----------------
+        //  ATTENDANCE FILTERING
         List<Student> eligible = new ArrayList<>();
         List<Student> review = new ArrayList<>();
 
@@ -75,7 +75,7 @@ public class GroupService {
         lastEligibleStudents = eligible.size();
         lastReviewStudents = review.size();
 
-        // ---------------- SORT ELIGIBLE BY SCORE DESC ----------------
+        //  SORT ELIGIBLE BY SCORE DESC
         eligible.sort((a, b) ->
                 Double.compare(b.getReadinessScore(), a.getReadinessScore()));
 
@@ -105,7 +105,6 @@ public class GroupService {
         else
             groups = mixed(best, avg, worst, groupSize);
 
-        // ---------------- ADD REVIEW GROUP ONLY IF NOT EMPTY ----------------
         if (!review.isEmpty()) {
             LinkedList<Student> reviewGroup = new LinkedList<>(review);
             groups.add(reviewGroup);
@@ -115,7 +114,6 @@ public class GroupService {
         return groups;
     }
 
-    // ---------------- GETTERS ----------------
     public LinkedList<LinkedList<Student>> getLastGroups() {
         return lastGeneratedGroups;
     }
@@ -156,7 +154,7 @@ public class GroupService {
         return lastReviewStudents;
     }
 
-    // ---------------- STRATEGY 1 ----------------
+    // STRATEGY 1
     private LinkedList<LinkedList<Student>> bestBest(List<Student> best,
                                                      List<Student> avg,
                                                      List<Student> worst,
@@ -185,7 +183,7 @@ public class GroupService {
         return groups;
     }
 
-    // ---------------- STRATEGY 2 ----------------
+    //  STRATEGY 2
     private LinkedList<LinkedList<Student>> bestAverage(List<Student> best,
                                                         List<Student> avg,
                                                         List<Student> worst,
@@ -220,7 +218,7 @@ public class GroupService {
         return groups;
     }
 
-    // ---------------- STRATEGY 3 ----------------
+    // STRATEGY 3
     private LinkedList<LinkedList<Student>> mixed(List<Student> best,
                                                   List<Student> avg,
                                                   List<Student> worst,

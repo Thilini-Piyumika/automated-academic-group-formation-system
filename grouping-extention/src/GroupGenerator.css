@@ -128,12 +128,10 @@ body {
   display: flex;
   align-items: center;
   gap: 8px;
-  font-size: 14px;
+  font-size: 18px;
 }
 
-/* ===============================
-   BUTTONS
-================================= */
+/* Buttons */
 
 .button-row {
   margin-top: 20px;
@@ -157,9 +155,7 @@ button:hover {
   box-shadow: 0 6px 18px rgba(37, 99, 235, 0.3);
 }
 
-/* ===============================
-   PREVIEW PANEL
-================================= */
+/*  PREVIEW PANEL*/
 
 .preview-panel {
   width: 70%;
@@ -179,9 +175,7 @@ button:hover {
   box-shadow: 0 8px 25px rgba(0, 0, 0, 0.08);
 }
 
-/* ===============================
-   GROUP BLOCK
-================================= */
+/* GROUP BLOCK */
 
 .group-block {
   margin-bottom: 30px;
@@ -193,9 +187,7 @@ button:hover {
   color: #374151;
 }
 
-/* ===============================
-   TABLE DESIGN
-================================= */
+/* TABLE DESIGN*/
 
 table {
   width: 100%;
@@ -221,9 +213,7 @@ tr:hover {
   background-color: #f3f4f6;
 }
 
-/* ===============================
-   CATEGORY COLORS (Soft Modern)
-================================= */
+/* CATEGORY COLORS (Soft Modern)*/
 
 .best-row {
   background-color: rgba(34, 197, 94, 0.15);
@@ -237,9 +227,7 @@ tr:hover {
   background-color: rgba(239, 68, 68, 0.15);
 }
 
-/* ===============================
-   EXCEL FORMAT BOX
-================================= */
+/* EXCEL FORMAT BOX*/
 
 .excel-format-box {
   margin-top: 15px;
@@ -264,9 +252,7 @@ tr:hover {
   font-weight: 500;
 }
 
-/* ===============================
-   INFO NOTE BOX (Reusable)
-================================= */
+/*INFO NOTE BOX (Reusable)*/
 
 .info-note-box {
   margin-top: 10px;
@@ -282,9 +268,7 @@ tr:hover {
   color: #1f2937;
   font-weight: 500;
 }
-/* ===============================
-   ANIMATIONS
-================================= */
+/* ANIMATIONS */
 
 @keyframes fadeIn {
   from {
@@ -297,9 +281,7 @@ tr:hover {
   }
 }
 
-/* ===============================
-   SCROLLBAR MODERN STYLE
-================================= */
+/* SCROLLBAR MODERN STYLE*/
 
 .preview-box::-webkit-scrollbar {
   width: 8px;
