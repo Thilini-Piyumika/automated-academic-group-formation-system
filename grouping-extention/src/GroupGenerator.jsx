@@ -74,7 +74,7 @@ const GroupGenerator = () => {
               GroupSync - Academic Group Formation Tool
             </h2>
             <p className="subtitle">
-              NIBM – Higher National Diploma in Software Engineering
+              Optimized Teams. Maximized Performance.
             </p>
           </div>
         </div>
@@ -183,6 +183,13 @@ const GroupGenerator = () => {
             />
             Detailed Excel Export
           </label>
+
+          <div className="info-note-box">
+            <small>
+              Detailed Excel Export: Enables export of full student details grouping summary. If disabled, 
+              only indexed group member lists are exported.
+            </small>
+          </div>
 
           <div className="button-row">
             <button onClick={handleGenerate}>Generate Groups</button>
