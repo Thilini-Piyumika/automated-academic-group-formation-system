@@ -11,8 +11,10 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 import com.nibm.academic_group_formation_tool.model.Student;
 
+import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Map;
 
 @RestController
 @RequestMapping("/api")
@@ -29,7 +31,7 @@ public class GroupController {
     private ExcelExportService exportService;
 
     @PostMapping("/upload")
-    public LinkedList<LinkedList<Student>> uploadExcel(
+    public Map<String, Object> uploadExcel(
             @RequestParam("file") MultipartFile file,
             @RequestParam("size") int size,
             @RequestParam("threshold") double threshold,
@@ -39,7 +41,15 @@ public class GroupController {
             @RequestParam("strategy") int strategy) throws Exception {
 
         List<Student> students = excelService.readExcel(file.getInputStream());
-        return groupService.createGroups(students, size, threshold, w1, w2, w3, strategy);
+
+        LinkedList<LinkedList<Student>> groups =
+                groupService.createGroups(students, size, threshold, w1, w2, w3, strategy);
+
+        Map<String, Object> response = new HashMap<>();
+        response.put("groups", groups);
+        response.put("reviewCount", groupService.getReviewStudents());
+
+        return response;
     }
 
     @GetMapping("/export")

@@ -13,6 +13,7 @@ const GroupGenerator = () => {
   const [strategy, setStrategy] = useState(2);
   const [detailed, setDetailed] = useState(true);
   const [groups, setGroups] = useState([]);
+  const [reviewCount, setReviewCount] = useState(0);
 
   const handleGenerate = async () => {
 
@@ -36,7 +37,8 @@ const GroupGenerator = () => {
     });
 
     const data = await response.json();
-    setGroups(data);
+    setGroups(data.groups);
+    setReviewCount(data.reviewCount);
   };
 
   const handleDownload = async () => {
@@ -69,7 +71,7 @@ const GroupGenerator = () => {
           <img src={nibmLogo} alt="NIBM Logo" className="logo" />
           <div>
             <h2 className="title">
-              GroupMe - Academic Group Formation Tool
+              GroupSync - Academic Group Formation Tool
             </h2>
             <p className="subtitle">
               NIBM – Higher National Diploma in Software Engineering
@@ -117,9 +119,11 @@ const GroupGenerator = () => {
             value={threshold}
             onChange={(e) => setThreshold(e.target.value)}
           />
-          <small>
-            Students below this percentage will be placed in the Review Group.
-          </small>
+          <div className="info-note-box">
+            <small>
+              Students below this percentage will be placed in the Review Group.
+            </small>
+          </div>
 
           <hr />
 
@@ -143,9 +147,11 @@ const GroupGenerator = () => {
             onChange={(e) => setW3(e.target.value)}
           />
 
-          <small>
-            Readiness Score = Weighted GPA of Attendance, Current GPA & Previous GPA.
-          </small>
+          <div className="info-note-box">
+            <small>
+              Readiness Score = Weighted GPA of Attendance, Current GPA & Previous GPA.
+            </small>
+          </div>
 
           <hr />
 
@@ -159,9 +165,13 @@ const GroupGenerator = () => {
             <option value="3">Strategy 3 – Mixed</option>
           </select>
 
-          <small>
-            Strategy 2 Order: BEST+AVG → BEST+WORST → AVG+WORST → Fill Remaining
-          </small>
+          <div className="info-note-box">
+            <small>
+              Strategy 1: Best grouped together sequentially.<br/>
+              Strategy 2: BEST+AVG → BEST+WORST → AVG+WORST → Fill Remaining.<br/>
+              Strategy 3: Rotational mix (BEST → AVERAGE → NEEDS_SUPPORT).
+            </small>
+          </div>
 
           <hr />
 
@@ -194,10 +204,13 @@ const GroupGenerator = () => {
 
             {groups.map((group, index) => {
 
-              const isLast = index === groups.length - 1;
-              const groupName = isLast
-                ? "Review Group"
-                : `Group ${index + 1}`;
+            const isReviewGroup =
+            reviewCount > 0 &&
+            index === groups.length - 1;
+
+            const groupName = isReviewGroup
+              ? "Review Group"
+              : `Group ${index + 1}`;
 
               return (
                 <div key={index} className="group-block">

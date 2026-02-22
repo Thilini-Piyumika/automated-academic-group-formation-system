@@ -265,6 +265,24 @@ tr:hover {
 }
 
 /* ===============================
+   INFO NOTE BOX (Reusable)
+================================= */
+
+.info-note-box {
+  margin-top: 10px;
+  padding: 12px;
+  background: #f9fafb;
+  border-left: 4px solid #2563eb;
+  border-radius: 10px;
+  font-size: 13px;
+}
+
+.info-note-box small {
+  display: block;
+  color: #1f2937;
+  font-weight: 500;
+}
+/* ===============================
    ANIMATIONS
 ================================= */
 
