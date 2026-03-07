@@ -16,6 +16,8 @@ public class GroupService {
     private int lastEligibleStudents;
     private int lastReviewStudents;
 
+    private BSTNode root;
+
     public LinkedList<LinkedList<Student>> createGroups(List<Student> students,
                                                         int groupSize,
                                                         double threshold,
@@ -24,7 +26,7 @@ public class GroupService {
                                                         double w3,
                                                         int strategy) {
 
-        // ---------------- VALIDATION ----------------
+        // VALIDATION
         if (threshold < 0) threshold = 0;
         if (threshold > 100) threshold = 100;
         if (groupSize <= 0) groupSize = 1;
@@ -36,13 +38,13 @@ public class GroupService {
         lastStrategy = strategy;
         lastGroupSize = groupSize;
 
-        // ---------------- READINESS SCORE CALCULATION ----------------
+        // READINESS SCORE CALCULATION
         for (Student s : students) {
 
             double attendanceGPA = (s.getAttendance() / 100.0) * 4.0;
             double totalWeight = w1 + w2 + w3;
 
-            if (totalWeight == 0) totalWeight = 1; // prevent divide by zero
+            if (totalWeight == 0) totalWeight = 1;
 
             double score = ((attendanceGPA * w1) +
                     (s.getThisYearGpa() * w2) +
@@ -60,9 +62,9 @@ public class GroupService {
                 s.setCategory("NEEDS_SUPPORT");
         }
 
-        //  ATTENDANCE FILTERING
-        List<Student> eligible = new ArrayList<>();
-        List<Student> review = new ArrayList<>();
+        // ATTENDANCE FILTERING USING QUEUE
+        Queue<Student> eligible = new LinkedList<>();
+        Queue<Student> review = new LinkedList<>();
 
         for (Student s : students) {
             if (s.getAttendance() >= threshold)
@@ -75,15 +77,24 @@ public class GroupService {
         lastEligibleStudents = eligible.size();
         lastReviewStudents = review.size();
 
-        //  SORT ELIGIBLE BY SCORE DESC
-        eligible.sort((a, b) ->
-                Double.compare(b.getReadinessScore(), a.getReadinessScore()));
+        // BST RANKING
+        root = null;
+
+        while (!eligible.isEmpty()) {
+            Student s = eligible.poll();
+            root = insert(root, s);
+        }
+
+        List<Student> sortedStudents = new ArrayList<>();
+        reverseInOrder(root, sortedStudents);
+
+        List<Student> eligibleList = sortedStudents;
 
         List<Student> best = new ArrayList<>();
         List<Student> avg = new ArrayList<>();
         List<Student> worst = new ArrayList<>();
 
-        for (Student s : eligible) {
+        for (Student s : eligibleList) {
             switch (s.getCategory()) {
                 case "BEST":
                     best.add(s);
@@ -112,6 +123,31 @@ public class GroupService {
 
         lastGeneratedGroups = groups;
         return groups;
+    }
+
+    // BST INSERT
+    private BSTNode insert(BSTNode node, Student student) {
+
+        if (node == null)
+            return new BSTNode(student);
+
+        if (student.getReadinessScore() < node.student.getReadinessScore())
+            node.left = insert(node.left, student);
+        else
+            node.right = insert(node.right, student);
+
+        return node;
+    }
+
+    // REVERSE IN-ORDER TRAVERSAL
+    private void reverseInOrder(BSTNode node, List<Student> sortedList) {
+
+        if (node == null)
+            return;
+
+        reverseInOrder(node.right, sortedList);
+        sortedList.add(node.student);
+        reverseInOrder(node.left, sortedList);
     }
 
     public LinkedList<LinkedList<Student>> getLastGroups() {
@@ -183,7 +219,7 @@ public class GroupService {
         return groups;
     }
 
-    //  STRATEGY 2
+    // STRATEGY 2
     private LinkedList<LinkedList<Student>> bestAverage(List<Student> best,
                                                         List<Student> avg,
                                                         List<Student> worst,
